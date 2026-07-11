@@ -8,6 +8,7 @@ import { DrunkVisualFx } from '../systems/DrunkVisualFx';
 import { SaveManager } from '../systems/SaveManager';
 import { MuteButton } from '../ui/MuteButton';
 import { showStageCard } from '../ui/StageCard';
+import { sizeToContract } from '../ui/sprites';
 import { showToast } from '../ui/Toast';
 
 const OBSTACLE_KEYS = [
@@ -57,8 +58,14 @@ export class ScooterScene extends Phaser.Scene {
     this.hearts = [];
 
     this.road = this.add.tileSprite(width / 2, height / 2, width, height, 'bg_road');
+    // Тайлим текстуру дороги в контрактном разрешении, а не в разрешении файла.
+    const roadSrc = this.textures.get('bg_road').getSourceImage();
+    if (roadSrc.width > 0) this.road.setTileScale(width / roadSrc.width);
 
-    this.player = this.physics.add.image(width / 2, height * 0.78, 'rodion_scooter');
+    this.player = sizeToContract(
+      this.physics.add.image(width / 2, height * 0.78, 'rodion_scooter'),
+      'rodion_scooter'
+    );
     this.player.body.setSize(this.player.width * 0.6, this.player.height * 0.55);
     this.targetX = width / 2;
     this.steeredX = width / 2;
@@ -70,7 +77,7 @@ export class ScooterScene extends Phaser.Scene {
 
     // Сердечки.
     for (let i = 0; i < b.hearts; i++) {
-      this.hearts.push(this.add.image(30 + i * 42, 34, 'ui_heart').setDepth(920));
+      this.hearts.push(sizeToContract(this.add.image(30 + i * 42, 34, 'ui_heart'), 'ui_heart').setDepth(920));
     }
 
     // Полоса прогресса до дома.
@@ -138,6 +145,7 @@ export class ScooterScene extends Phaser.Scene {
     const x = Phaser.Math.Between(left, right);
 
     const obs = this.obstacles.create(x, -80, key) as Phaser.Types.Physics.Arcade.ImageWithDynamicBody;
+    sizeToContract(obs, key);
     obs.body.setSize(obs.width * 0.75, obs.height * 0.7);
     obs.setVelocityY(this.currentSpeed());
     // Бабка ходит поперёк дороги.

@@ -6,6 +6,7 @@ import { DrunkMeter } from '../systems/DrunkMeter';
 import { MixTracker } from '../systems/MixTracker';
 import { Button } from '../ui/Button';
 import { MuteButton } from '../ui/MuteButton';
+import { sizeToContract } from '../ui/sprites';
 
 export class MenuScene extends Phaser.Scene {
   constructor() {
@@ -44,7 +45,7 @@ export class MenuScene extends Phaser.Scene {
       })
       .setOrigin(0.5);
 
-    this.add.image(width / 2, height * 0.47, 'rodion_idle').setScale(0.9);
+    sizeToContract(this.add.image(width / 2, height * 0.47, 'rodion_idle'), 'rodion_idle', 0.9);
 
     new Button(this, width / 2, height * 0.68, STRINGS.menu.play, () => this.startRun());
     new Button(

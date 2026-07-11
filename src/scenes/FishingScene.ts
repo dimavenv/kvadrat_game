@@ -9,6 +9,7 @@ import { MixTracker } from '../systems/MixTracker';
 import { SaveManager } from '../systems/SaveManager';
 import { MuteButton } from '../ui/MuteButton';
 import { showStageCard } from '../ui/StageCard';
+import { sizeToContract } from '../ui/sprites';
 import { showToast } from '../ui/Toast';
 
 type FishingState = 'idle' | 'cast' | 'wait' | 'strike' | 'reel' | 'done';
@@ -81,10 +82,10 @@ export class FishingScene extends Phaser.Scene {
     this.newAchievements = [];
 
     this.add.image(width / 2, height / 2, 'bg_lake').setDisplaySize(width, height);
-    this.ded = this.add.image(width * 0.78, height * 0.2, 'ded').setScale(0.8);
-    this.rodion = this.add.image(width * 0.24, height * 0.82, 'rodion_fishing');
+    this.ded = sizeToContract(this.add.image(width * 0.78, height * 0.2, 'ded'), 'ded', 0.8);
+    this.rodion = sizeToContract(this.add.image(width * 0.24, height * 0.82, 'rodion_fishing'), 'rodion_fishing');
 
-    this.bobber = this.add.image(width * 0.55, height * 0.6, 'bobber').setVisible(false);
+    this.bobber = sizeToContract(this.add.image(width * 0.55, height * 0.6, 'bobber'), 'bobber').setVisible(false);
 
     this.timerText = this.add
       .text(width - 24, 30, '', {
@@ -310,7 +311,8 @@ export class FishingScene extends Phaser.Scene {
     const c = this.add.container(this.reelBarX, this.reelBarY).setDepth(922);
     const bg = this.add.rectangle(0, 0, barW, h, 0x14303c).setStrokeStyle(4, 0x000000);
     this.reelZone = this.add.rectangle(0, 0, barW - 8, h * f.reelPlayerZone, 0x5fbf4a, 0.75);
-    this.reelFish = this.add.image(0, 0, 'catch_tolstolobik').setScale(0.45);
+    // Рыбку в узкой полосе показываем мельче контракта, чтобы влезла.
+    this.reelFish = sizeToContract(this.add.image(0, 0, 'catch_tolstolobik'), 'catch_tolstolobik', 0.32);
 
     // Слева от бара: прогресс подъёма и «леска».
     const progressBg = this.add.rectangle(-barW + 6, 0, 12, h, 0x1a1a1e).setStrokeStyle(2, 0x000000);
@@ -399,16 +401,17 @@ export class FishingScene extends Phaser.Scene {
     const { width, height } = BALANCE.view;
     AudioManager.play(this, 'splash');
 
-    const sprite = this.add
-      .image(this.bobber.x, this.bobber.y + 30, `catch_${kind}`)
-      .setDepth(923)
-      .setScale(0.2)
-      .setAlpha(0);
+    const sprite = sizeToContract(
+      this.add.image(this.bobber.x, this.bobber.y + 30, `catch_${kind}`),
+      `catch_${kind}`
+    ).setDepth(923);
+    const base = sprite.scaleX;
+    sprite.setScale(base * 0.2).setAlpha(0);
     this.tweens.add({
       targets: sprite,
       x: width / 2,
       y: height * 0.45,
-      scale: 1.15,
+      scale: base * 1.1,
       alpha: 1,
       angle: kind === 'tolstolobik' ? 0 : Phaser.Math.Between(-25, 25),
       duration: 550,

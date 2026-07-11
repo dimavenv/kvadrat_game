@@ -10,6 +10,7 @@ import { SaveManager } from '../systems/SaveManager';
 import { Button } from '../ui/Button';
 import { Meter } from '../ui/Meter';
 import { MuteButton } from '../ui/MuteButton';
+import { sizeToContract } from '../ui/sprites';
 import { showToast } from '../ui/Toast';
 
 interface BottleSlot {
@@ -17,6 +18,8 @@ interface BottleSlot {
   sprite: Phaser.GameObjects.Image;
   homeX: number;
   homeY: number;
+  /** Масштаб после приведения к контракту — база для scale-анимаций. */
+  baseScale: number;
 }
 
 export class BarScene extends Phaser.Scene {
@@ -63,7 +66,7 @@ export class BarScene extends Phaser.Scene {
       })
       .setOrigin(0.5);
 
-    this.rodion = this.add.image(width * 0.32, height * 0.62, 'rodion_idle');
+    this.rodion = sizeToContract(this.add.image(width * 0.32, height * 0.62, 'rodion_idle'), 'rodion_idle');
     this.updateRodionLook();
 
     // Полка с бутылками.
@@ -71,7 +74,9 @@ export class BarScene extends Phaser.Scene {
     const step = width / (DRINKS.length + 0.4);
     DRINKS.forEach((drink, i) => {
       const x = step * (i + 0.7);
-      const sprite = this.add.image(x, shelfY, drink.textureKey).setInteractive({ useHandCursor: true });
+      const sprite = sizeToContract(this.add.image(x, shelfY, drink.textureKey), drink.textureKey).setInteractive({
+        useHandCursor: true,
+      });
       sprite.on('pointerup', () => this.drink(this.bottles[i]));
       this.add
         .text(x, shelfY + 78, `${drink.name}\n${drink.degrees}° · +${drink.gain}${drink.gainJitter ? '±' + drink.gainJitter : ''}`, {
@@ -83,7 +88,7 @@ export class BarScene extends Phaser.Scene {
           strokeThickness: 3,
         })
         .setOrigin(0.5);
-      this.bottles.push({ drink, sprite, homeX: x, homeY: shelfY });
+      this.bottles.push({ drink, sprite, homeX: x, homeY: shelfY, baseScale: sprite.scaleX });
     });
 
     const barman = this.add
@@ -159,7 +164,7 @@ export class BarScene extends Phaser.Scene {
         this.meter.animateTo(value, BALANCE.drunk.meterTweenMs);
         this.tweens.add({
           targets: slot.sprite,
-          scale: { from: 1, to: 0.92 },
+          scale: { from: slot.baseScale, to: slot.baseScale * 0.92 },
           duration: 130,
           yoyo: true,
           repeat: 2,
@@ -172,7 +177,7 @@ export class BarScene extends Phaser.Scene {
             x: slot.homeX,
             y: slot.homeY,
             angle: 0,
-            scale: 1,
+            scale: slot.baseScale,
             duration: 220,
             ease: 'Cubic.easeIn',
           });

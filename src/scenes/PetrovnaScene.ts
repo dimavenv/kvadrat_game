@@ -7,6 +7,7 @@ import { DrunkMeter } from '../systems/DrunkMeter';
 import { DrunkVisualFx } from '../systems/DrunkVisualFx';
 import { DialogueBox } from '../ui/DialogueBox';
 import { MuteButton } from '../ui/MuteButton';
+import { sizeToContract } from '../ui/sprites';
 import { showStageCard } from '../ui/StageCard';
 
 interface ShownOption {
@@ -40,8 +41,8 @@ export class PetrovnaScene extends Phaser.Scene {
     this.finished = false;
 
     this.add.image(width / 2, height / 2, 'bg_kiosk').setDisplaySize(width, height);
-    this.rodion = this.add.image(width * 0.22, height * 0.52, 'rodion_idle').setScale(0.85);
-    this.nastya = this.add.image(width + 120, height * 0.52, 'nastya').setScale(0.9);
+    this.rodion = sizeToContract(this.add.image(width * 0.22, height * 0.52, 'rodion_idle'), 'rodion_idle', 0.85);
+    this.nastya = sizeToContract(this.add.image(width + 120, height * 0.52, 'nastya'), 'nastya', 0.9);
 
     this.box = new DialogueBox(this, width / 2, height - 160, width - 32);
 
