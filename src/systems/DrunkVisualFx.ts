@@ -46,9 +46,12 @@ export class DrunkVisualFx {
   }
 
   destroy(): void {
-    const cam = this.scene.cameras.main;
-    cam.setRotation(0);
-    cam.setZoom(1);
-    this.overlay.destroy();
+    // На SHUTDOWN сцены камеры могут быть уже уничтожены.
+    const cam: Phaser.Cameras.Scene2D.Camera | undefined = this.scene.cameras?.main;
+    if (cam) {
+      cam.setRotation(0);
+      cam.setZoom(1);
+    }
+    if (this.overlay.active) this.overlay.destroy();
   }
 }

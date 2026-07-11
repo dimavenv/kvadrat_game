@@ -129,9 +129,14 @@ export class BarScene extends Phaser.Scene {
     this.rodion.setTint(Phaser.Display.Color.GetColor(Math.round(c.r), Math.round(c.g), Math.round(c.b)));
   }
 
+  private setBottlesDimmed(dimmed: boolean): void {
+    this.bottles.forEach((b) => b.sprite.setAlpha(dimmed ? 0.55 : 1));
+  }
+
   private drink(slot: BottleSlot): void {
     if (this.inputLocked || this.over) return;
     this.inputLocked = true;
+    this.setBottlesDimmed(true);
 
     const d = slot.drink;
     const jitter = d.gainJitter > 0 ? Phaser.Math.Between(-d.gainJitter, d.gainJitter) : 0;
@@ -205,6 +210,7 @@ export class BarScene extends Phaser.Scene {
       this.blackout();
     } else {
       this.inputLocked = false;
+      this.setBottlesDimmed(false);
     }
   }
 
